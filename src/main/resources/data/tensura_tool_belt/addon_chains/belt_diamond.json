@@ -1,0 +1,7 @@
+{
+  "item": "travelertoolbelt:diamond_belt",
+  "minEP": 16000,
+  "maxEP": 32000,
+  "epGain": 0.006,
+  "evolution": "travelertoolbelt:netherite_belt"
+}

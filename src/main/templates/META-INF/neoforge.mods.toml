@@ -1,0 +1,60 @@
+# Mod metadata file. Values written in dollar-brace form are replaced at build
+# time from gradle.properties (see generateModMetadata in build.gradle), so mod
+# identity is edited in one place only.
+# See https://docs.neoforged.net/docs/concepts/modfiles/ for the full schema.
+
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+# The belts are the items the ladder evolves, so the mod is required: without it
+# every chain file points at an item that does not exist.
+[[dependencies.${mod_id}]]
+modId = "travelertoolbelt"
+type = "required"
+versionRange = "[${traveler_tool_belt_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+# Gear Evolution is the evolution engine. Without it the chains are inert data
+# and the belts work and craft exactly as Traveler Tool Belt ships them, they
+# just never progress. It requires Tensura, ManasCore and Architectury itself.
+[[dependencies.${mod_id}]]
+modId = "gearevolution"
+type = "optional"
+versionRange = "[${gearevolution_mod_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+# Tensura holds the EP the belts earn through, so the ladder only runs with it.
+# No chain file names a tensura: item; the dependence is the EP system itself.
+[[dependencies.${mod_id}]]
+modId = "tensura"
+type = "optional"
+versionRange = "[${tensura_mod_version},)"
+ordering = "AFTER"
+side = "BOTH"

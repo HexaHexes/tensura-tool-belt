@@ -1,0 +1,7 @@
+{
+  "item": "travelertoolbelt:gold_belt",
+  "minEP": 4000,
+  "maxEP": 16000,
+  "epGain": 0.004,
+  "evolution": "travelertoolbelt:diamond_belt"
+}

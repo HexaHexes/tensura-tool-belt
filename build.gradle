@@ -1,0 +1,209 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    // Keep in sync with rootProject.name in settings.gradle and mod_id in
+    // gradle.properties. The shipped jar is <archivesName>-<version>.jar.
+    archivesName = mod_id
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+// Game tests live in their own source set: they compile against main, and are
+// deliberately NOT part of sourceSets.main - so none of it is packaged into the
+// released jar. Declared before neoForge because the mods block below joins it.
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += output + sourceSets.main.output + configurations.runtimeClasspath
+    }
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+        }
+
+        // Headless test runner. NeoForge's patched server Main boots a
+        // GameTestServer that runs every registered @GameTest and exits - no
+        // window, no live instance. This is the only verification gate.
+        gameTestServer {
+            type = "gameTestServer"
+            gameDirectory = project.layout.projectDirectory.dir('run')
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            // The gametest source set joins the mod for the dev runs so
+            // @GameTestHolder is discovered from FML's scan data. It is still
+            // not in the jar - the jar only packages sourceSets.main.
+            sourceSet sourceSets.gametest
+        }
+    }
+}
+
+// Expand the ${...} placeholders in src/main/templates into the real
+// neoforge.mods.toml at build time, so mod identity is edited in one place
+// (gradle.properties) rather than duplicated in the toml.
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+            minecraft_version               : minecraft_version,
+            minecraft_version_range         : minecraft_version_range,
+            neo_version                     : neo_version,
+            loader_version_range            : loader_version_range,
+            mod_id                          : mod_id,
+            mod_name                        : mod_name,
+            mod_license                     : mod_license,
+            mod_version                     : mod_version,
+            mod_authors                     : mod_authors,
+            mod_description                 : mod_description,
+            gearevolution_mod_version       : gearevolution_mod_version,
+            tensura_mod_version             : tensura_mod_version,
+            traveler_tool_belt_version      : traveler_tool_belt_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/sources/modMetadata')
+}
+// Feed the generated metadata in as a resource dir; passing the task provider
+// wires the dependency so the toml is generated before resources are processed.
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    // CurseMaven - resolves mod jars by CurseForge project + file id. Tensura,
+    // Gear Evolution and their library closure all come from here, so a clean
+    // checkout (and CI) resolves every jar without a local folder.
+    maven {
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
+    // Traveler Tool Belt resolves from Modrinth's own maven, pinned by Modrinth
+    // version id - its version number is shared with the Fabric release, and the
+    // number coordinate resolves to that Fabric jar.
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    mavenCentral()
+}
+
+configurations {
+    // Runtime closure for the GameTest run: staged into run/mods by
+    // prepareGametestMods, exactly like the rest of the org's mod repos.
+    gametestMods
+}
+
+dependencies {
+    // Compile-only against Gear Evolution: the gametest suite links its addon
+    // chain catalog, evolution resolver and accessory evolution path. The
+    // shipped mod is pure data - no runtime code path touches these classes.
+    // Coordinates are CurseMaven so a clean checkout resolves every jar - never
+    // gitignored libs/.
+    compileOnly "curse.maven:gearevolution-1501711:${gearevolution_file_id}" // gearevolution-1.3.0
+    // Tensura and Architectury, for the EP components the suite drives a belt
+    // through (TensuraDataComponents and its RegistrySupplier type). Tensura is
+    // all rights reserved: compile only, never bundled.
+    compileOnly "curse.maven:tensura-reincarnated-643695:${tensura_file_id}"
+    compileOnly "curse.maven:architectury-419699:${architectury_file_id}"
+
+    // Tensura: Reincarnated and its required closure, for the run-only mods
+    // folder. Gear Evolution requires Tensura, ManasCore, Architectury and
+    // (client-side) Cloth Config; Tensura requires the other three.
+    gametestMods "curse.maven:gearevolution-1501711:${gearevolution_file_id}"
+    gametestMods "curse.maven:architectury-419699:${architectury_file_id}"
+    gametestMods "curse.maven:cloth-config-348521:${cloth_config_file_id}"
+    gametestMods "curse.maven:geckolib-388172:${geckolib_file_id}"
+    // The core jar nests every manascore-* module under META-INF/jars; FML's
+    // nested-jar loader installs them at runtime, so only the core is staged.
+    gametestMods "curse.maven:manascore-619025:${manascore_file_id}"
+    gametestMods "curse.maven:smartbrainlib-661293:${smartbrainlib_file_id}"
+    gametestMods "curse.maven:tensura-reincarnated-643695:${tensura_file_id}"
+    gametestMods "curse.maven:terrablender-940057:${terrablender_file_id}"
+    // The mod this addon evolves: without it there is nothing to register.
+    gametestMods "maven.modrinth:traveler-tool-belt:${traveler_tool_belt_mod_version}" // travelertoolbelt 1.0.4
+
+    // JUnit suite: the CI junit check grades it and refuses to pass on an empty
+    // run, so this configuration must stay wired in every derived repo.
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // The chain files are JSON; Minecraft supplies Gson at runtime, the plain
+    // JUnit classpath does not. Same version Minecraft ships.
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    // The entry point logs through slf4j, which Minecraft supplies at runtime but
+    // which is not on the plain JUnit classpath.
+    testImplementation 'org.slf4j:slf4j-api:2.0.13'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// --- GameTest harness -------------------------------------------------------
+
+// Stage the pack's dependency mod jars into the run's production-style mods/
+// folder, where FML's mods-folder locator finds them exactly like in the pack.
+tasks.register('prepareGametestMods', Sync) {
+    from configurations.gametestMods
+    into 'run/mods'
+}
+
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    dependsOn 'prepareGametestMods'
+
+    // Grade the run on the log summary, not the exit code: the GameTestServer
+    // prints "All N required tests passed :)" when every required test succeeds.
+    // Keep expectedTests in sync with the @GameTest methods in src/gametest.
+    def expectedTests = 5
+    doLast {
+        def log = file('run/logs/latest.log')
+        if (!log.exists()) {
+            throw new GradleException("GameTest produced no log at ${log}")
+        }
+        def text = log.text
+        def problems = []
+        def passMatcher = (text =~ /All (\d+) required tests passed/)
+        if (passMatcher.find()) {
+            def passed = passMatcher.group(1) as int
+            if (passed != expectedTests) {
+                problems << "only ${passed}/${expectedTests} tests passed"
+            }
+        } else if ((text =~ /\d+ required tests failed/).find()) {
+            problems << 'GameTest reported failed tests'
+        } else {
+            problems << 'no GameTest summary found in log'
+        }
+        if (text.contains('Encountered an unexpected exception')) {
+            problems << 'server crashed during tests'
+        }
+        if (problems) {
+            throw new GradleException("GameTest failed: ${problems.join('; ')} - see ${log}")
+        }
+        logger.lifecycle("GameTest OK: all ${expectedTests} tests passed")
+    }
+}
