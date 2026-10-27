@@ -139,4 +139,14 @@ warning working, not a failure.
 ## CI & release model - this repo
 
 - `ci.yml` runs the template's three checks (junit, gametest, version-bump).
-  `release.yml` is not enabled yet - it needs a CI-built jar to attach.
+- `release.yml` publishes a GitHub release for `v<mod_version>` on a push to `main`,
+  attaching the built jar, and does nothing when that release already exists. It was
+  copied from `tensura-iaf-growth`, the org's reference implementation, because the
+  template does not ship one yet (`neoforge-mod-template` #4 tracks promoting it) -
+  when that lands, reconcile this file with the template's rather than editing both.
+- Pre-releases are opt-in: an `-alpha`/`-beta` version publishes only when the
+  repository variable `ALPHA_RELEASES` is `true`. It is enabled on this repo, so
+  `1.0.0-alpha.1` is a downloadable pre-release; a version with no matching release
+  and the variable switched off is skipped with a log line, not a failure.
+- The release workflow builds with `./gradlew build`, so the jar it attaches is the
+  one the JUnit suite passed against, not a separate packaging path.
