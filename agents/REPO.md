@@ -100,9 +100,15 @@ warning working, not a failure.
   two optional Modrinth dependencies are Curios API and Accessories). So an
   Accessories-only or Trinkets-only pack wears the belt fine and simply never earns EP,
   with no error at all. `BeltProgress` reports exactly that configuration at startup,
-  and `TensuraToolBeltTest` pins both the rule and the fact that the warning names all
+  and  `TensuraToolBeltTest` pins both the rule and the fact that the warning names all
   three mods. Do not weaken it into a config-dependent message: the mod list is the only
   input there.
+- **The pack ships Curios, so the Accessories-only failure mode is not the supported
+  configuration.** Verified 2026-10-27 against the Tensura RPG instance's `mods/`:
+  `curios-neoforge-9.5.1+1.21.1.jar` is present and there is no Accessories jar. Keep the
+  warning regardless - it is what tells a future pack without Curios that the ladder is
+  inert (issue #2, closed on this evidence and to be reopened if that changes).
+
 - **An Accessories bridge cannot be data, and is not this repo's for the taking.** Gear
   Evolution's two hook setters (`GearKillEpHandler.setAccessoryKillHook` /
   `setAccessoryKillSourceHook`) are public but have no getters, so anything that sets
