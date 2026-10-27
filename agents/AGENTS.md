@@ -165,6 +165,13 @@ file into this repo verbatim as its own PR - never re-type or patch it by hand.
   `require-review-from-write-access` (one approving review; the listed org owners
   bypass). Direct pushes to the default branch are rejected by GitHub.
 - `version-bump.yml` opens an isolated version-bump PR (only the version file changes).
+- `release.yml` publishes a GitHub release for `v<mod_version>` on a push to the default
+  branch when that release does not exist yet, attaching the jar the build produced. The
+  jar name is read from `mod_id`, so a rename needs no edit here. Pre-releases are
+  opt-in: an `-alpha`/`-beta` version publishes only when the repository variable
+  `ALPHA_RELEASES` is `true`, otherwise it is skipped with a log line rather than a
+  failure. Promoted from `tensura-iaf-growth`, the org's reference implementation, and
+  its release notes are player-facing - rewrite them when promoting the file into a mod.
 - CurseForge publishing (`curseforge.yml`) is **deferred** until the mod has a CurseForge
   listing and the `CURSEFORGE_PROJECT_ID` / `CURSEFORGE_API_KEY` secrets. Do not add it
   speculatively.
