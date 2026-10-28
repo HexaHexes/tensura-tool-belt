@@ -9,8 +9,9 @@ and is edited freely; keep it aligned with the org rules rather than restating t
 **Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_tool_belt-<version>.jar`
 
 Registers Traveler Tool Belt's six belts with Tensura: Gear Evolution's `addon_chains/`
-so they earn EP and evolve tier to tier, on the same EP ladder the Lightman's Currency
-wallets use in `lightmans-tensura`. Pure data: no code beyond the mod entry point, no
+so they earn EP and evolve tier to tier, on Gear Evolution's canonical material
+progression - the same values the Lightman's Currency wallets climb in
+`lightmans-tensura`. Pure data: no code beyond the mod entry point, no
 mixins, nothing packaged that runs.
 
 **Dependencies**
@@ -34,15 +35,24 @@ warning working, not a failure.
 
 ## Gotchas (do not regress them)
 
-- **The ladder is the wallets' ladder, tier for tier.** `belt` (called leather in
-  Traveler Tool Belt's own config) 0 -> 1000 @ 0.001, `copper_belt` 1000 -> 2000 @
-  0.002, `iron_belt` 2000 -> 4000 @ 0.003, `gold_belt` 4000 -> 16000 @ 0.004,
-  `diamond_belt` 16000 -> 32000 @ 0.006, `netherite_belt` 32000 -> 100000 @ 0.006 and
-  terminal. Every value is the same-material wallet rung's value from
-  `lightmans-tensura`; the only deliberate deviation is `gold_belt`'s ceiling, because
-  the wallets' emerald rung (8000 -> 16000) has no belt to spend it. Hand-offs land
-  exactly on the next rung's floor, so no tier is skipped and none is entered
-  part-way - both test suites assert that, and neither may be loosened to allow a gap.
+- **The ladder is Gear Evolution's canonical material progression.** Every tier
+  uses the values GE ships for leather → chainmail → iron → gold → diamond →
+  netherite (from its builtin `gear_existence` chestplate ladders), each belt tier
+  taking the rung in its position: `belt` (called leather in Traveler Tool Belt's
+  own config) 0 → 550 @ 0.003, `copper_belt` (chainmail's slot) 550 → 1350 @
+  0.003, `iron_belt` 1350 → 3200 @ 0.003, `gold_belt` 3200 → 5000 @ 0.003,
+  `diamond_belt` 5000 → 7800 @ 0.003, `netherite_belt` 7800 → 17500 @ 0.003 and
+  terminal. The climb rate is flat 0.003 because that is what canonical GE uses on
+  every rung of the progression. Two numbers are ours, not GE's: **gold's 5000**
+  (canonical armor skips gold entirely - golden armor is a side branch to silver at
+  500 - so 5000 was chosen as the midpoint between iron 3200 and diamond 7800), and
+  **emerald's absence**: `lightmans-tensura`'s wallet inserts a wallet-only rung
+  5000 → 6400, which has no belt - `gold_belt` hands off exactly at its floor (5000)
+  and `diamond_belt` spans the whole band by starting at 5000 too, so no EP is
+  dead. Hand-offs land exactly on the next rung's floor, so no tier is skipped and
+  none is entered part-way - both test suites assert that, and neither may be
+  loosened to allow a gap. Both suites also pin gold's hand-off at the emerald
+  floor; if `lightmans-tensura`'s emerald band moves, this ladder moves with it.
 - **Traveler Tool Belt ships exactly six items** - `belt`, `copper_belt`, `iron_belt`,
   `gold_belt`, `diamond_belt`, `netherite_belt` (verified against
   travellertoolbelt 1.0.4's `ModItems`; there are no other items in its registry). A
@@ -56,8 +66,9 @@ warning working, not a failure.
   six file names, and `chainDirectoryHoldsExactlyTheLadder` rejects strays.
 - **`maxEP` is required by Gear Evolution's chain parser** (`DefinitionNumbers.integer`
   throws when the key is absent, and a throwing chain is skipped with a log line, not a
-  crash). The terminal rung therefore carries `maxEP: 100000` - the same ceiling the
-  wallets' top wallet uses - rather than omitting it. `minEP` defaults to 0 when
+  crash). The terminal rung therefore carries `maxEP: 17500` - the canonical netherite
+  ceiling, where the belt ladder ends (the wallets run on past it into GE's magisteel
+  tail, 18000 → 52000; belts have no such tiers) - rather than omitting it. `minEP` defaults to 0 when
   absent; `evolution` is genuinely optional and its absence is what makes a rung
   terminal.
 - **No `evolutionOptions`.** The ladder is linear; the GameTest asserts every rung has

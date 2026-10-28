@@ -1,8 +1,8 @@
 # Tensura Tool Belt
 
 Lets **Traveler Tool Belt**'s belts grow with you: a belt you wear earns EP from the
-mobs you kill, and once it is full it evolves into the next tier — the same ladder the
-Lightman's Currency wallets climb.
+mobs you kill, and once it is full it evolves into the next tier — the same material
+progression the Lightman's Currency wallets climb.
 
 ## What it does
 
@@ -16,21 +16,22 @@ Lightman's Currency wallets climb.
   has to be in your Curios belt slot while you fight. Without Curios it still works as
   a belt, but it never progresses - and the mod says so in the log at startup rather
   than leaving you guessing.
-- **Same ladder as the wallets.** Every tier uses the Lightman's Currency wallet
-  ladder's own numbers. The wallets have an emerald rung and Traveler Tool Belt has no
-  emerald tier, so the gold belt climbs through that band and hands off to the diamond
-  belt — no dead stretch where the belt earns EP but nothing happens.
+- **Same progression as the wallets.** Every tier uses Gear Evolution's own material
+  values — leather 550, chainmail 1350, iron 3200, gold 5000, diamond 7800, netherite
+  17500 — so a belt climbs at the same pace as armor. The wallets add an emerald rung
+  (5,000 → 6,400) that Traveler Tool Belt has no tier for, so the diamond belt spans
+  that band instead — no dead stretch where the belt earns EP but nothing happens.
 - **Without Gear Evolution nothing breaks.** The belts craft, hold and swap exactly as
   Traveler Tool Belt ships them; they just never progress.
 
 | Belt | Earns from EP | Upgrades into |
 |---|---|---|
 | Tool Belt | 0 EP | Copper Tool Belt |
-| Copper Tool Belt | 1,000 EP | Iron Tool Belt |
-| Iron Tool Belt | 2,000 EP | Gold Tool Belt |
-| Gold Tool Belt | 4,000 EP | Diamond Tool Belt |
-| Diamond Tool Belt | 16,000 EP | Netherite Tool Belt |
-| Netherite Tool Belt | 32,000 EP | — (top tier) |
+| Copper Tool Belt | 550 EP | Iron Tool Belt |
+| Iron Tool Belt | 1,350 EP | Gold Tool Belt |
+| Gold Tool Belt | 3,200 EP | Diamond Tool Belt |
+| Diamond Tool Belt | 5,000 EP | Netherite Tool Belt |
+| Netherite Tool Belt | 7,800 EP | — (top tier) |
 
 ## Getting it in-game
 
