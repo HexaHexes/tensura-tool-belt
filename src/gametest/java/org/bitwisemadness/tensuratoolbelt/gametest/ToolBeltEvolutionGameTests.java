@@ -34,24 +34,28 @@ import org.bitwisemadness.tensuratoolbelt.TensuraToolBelt;
 public final class ToolBeltEvolutionGameTests {
 
     /**
-     * The whole ladder, at literal values. The wallet ladder's numbers, tier for
-     * tier; the emerald rung has no belt of its own, so {@code gold} carries its
-     * band and hands off to diamond's own floor.
+     * The whole ladder, at literal values. Gear Evolution's canonical material
+     * progression - leather, chainmail, iron, gold, diamond, netherite - at its own
+     * values and its flat 0.003 climb rate, each belt tier taking the rung in its
+     * position: {@code belt} is leather, {@code copper_belt} sits in chainmail's
+     * slot. The wallets share every one of these ceilings; their emerald rung
+     * (5000..6400) has no belt, so the diamond belt carries that band.
      */
     private static final List<Tier> LADDER = List.of(
-            new Tier("travelertoolbelt:belt", 0, 1000, 0.001, "travelertoolbelt:copper_belt"),
-            new Tier("travelertoolbelt:copper_belt", 1000, 2000, 0.002, "travelertoolbelt:iron_belt"),
-            new Tier("travelertoolbelt:iron_belt", 2000, 4000, 0.003, "travelertoolbelt:gold_belt"),
-            new Tier("travelertoolbelt:gold_belt", 4000, 16000, 0.004, "travelertoolbelt:diamond_belt"),
-            new Tier("travelertoolbelt:diamond_belt", 16000, 32000, 0.006, "travelertoolbelt:netherite_belt"),
-            new Tier("travelertoolbelt:netherite_belt", 32000, 100000, 0.006, null));
+            new Tier("travelertoolbelt:belt", 0, 550, 0.003, "travelertoolbelt:copper_belt"),
+            new Tier("travelertoolbelt:copper_belt", 550, 1350, 0.003, "travelertoolbelt:iron_belt"),
+            new Tier("travelertoolbelt:iron_belt", 1350, 3200, 0.003, "travelertoolbelt:gold_belt"),
+            new Tier("travelertoolbelt:gold_belt", 3200, 5000, 0.003, "travelertoolbelt:diamond_belt"),
+            new Tier("travelertoolbelt:diamond_belt", 5000, 7800, 0.003, "travelertoolbelt:netherite_belt"),
+            new Tier("travelertoolbelt:netherite_belt", 7800, 17500, 0.003, null));
 
     /** The lightest rung's floor: the ladder starts at nothing earned. */
     private static final int FIRST_FLOOR = 0;
-    /** The top rung's ceiling, the same terminal ceiling the wallets' top wallet uses. */
-    private static final int TERMINAL_CEILING = 100000;
-    /** The band the wallets spend on their emerald rung; the gold belt carries it. */
-    private static final int EMERALD_BAND_TOP = 16000;
+    /** The top rung's ceiling: the canonical netherite ceiling; belts end here. */
+    private static final int TERMINAL_CEILING = 17500;
+    /** The band the wallets spend on their emerald rung; the diamond belt carries it. */
+    private static final int EMERALD_BAND_FLOOR = 5000;
+    private static final int EMERALD_BAND_TOP = 6400;
 
     private record Tier(String item, int minEp, int maxEp, double epGain, String evolution) {
     }
@@ -121,7 +125,7 @@ public final class ToolBeltEvolutionGameTests {
      * The ladder as Gear Evolution sees it is contiguous: floors ascend, every rung
      * hands off exactly onto the next rung's floor (so nothing is skipped and no
      * tier is entered part-way through), exactly one rung is terminal, and the top
-     * rung ends on the wallets' terminal ceiling.
+     * rung ends on the canonical netherite ceiling.
      */
     @GameTest(template = "empty")
     public static void beltLadderIsContiguous(GameTestHelper helper) {
@@ -154,11 +158,16 @@ public final class ToolBeltEvolutionGameTests {
         }
         require(terminals == 1, terminals + " terminal rungs; the ladder must have exactly one");
 
-        // The wallets' emerald rung has no belt: gold must carry its band rather
-        // than leave 8000..16000 as dead EP that no belt can spend.
+        // The wallets' emerald rung has no belt: gold must hand off exactly where
+        // it begins, and the diamond belt must carry its band rather than leave
+        // 5000..6400 as dead EP that no belt can spend.
         AddonGearChainOverride gold = chain("travelertoolbelt:gold_belt");
-        require(gold.maxEP() == EMERALD_BAND_TOP,
-                "the gold belt hands off at " + gold.maxEP() + " - the emerald band's top is " + EMERALD_BAND_TOP);
+        require(gold.maxEP() == EMERALD_BAND_FLOOR,
+                "the gold belt hands off at " + gold.maxEP() + " - the emerald band's floor is " + EMERALD_BAND_FLOOR);
+        AddonGearChainOverride diamond = chain("travelertoolbelt:diamond_belt");
+        require(diamond.minEP() <= EMERALD_BAND_FLOOR && diamond.maxEP() > EMERALD_BAND_TOP,
+                "the diamond belt spans " + diamond.minEP() + ".." + diamond.maxEP()
+                        + " and does not cover the emerald band " + EMERALD_BAND_FLOOR + ".." + EMERALD_BAND_TOP);
         helper.succeed();
     }
 
