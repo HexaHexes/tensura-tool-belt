@@ -32,22 +32,27 @@ class BeltLadderTest {
     private static final String CHAIN_DIRECTORY = "data/tensura_tool_belt/addon_chains";
     private static final String MOD_NAMESPACE = "travelertoolbelt";
     private static final int FIRST_FLOOR = 0;
-    private static final int TERMINAL_CEILING = 100000;
-    /** The wallets spend this band on their emerald rung, which has no belt. */
-    private static final int EMERALD_BAND_TOP = 16000;
+    /** The canonical netherite ceiling; the wallets run on past it, belts end here. */
+    private static final int TERMINAL_CEILING = 17500;
+    /** The wallets spend 5000..6400 on their emerald rung, which has no belt. */
+    private static final int EMERALD_BAND_FLOOR = 5000;
+    private static final int EMERALD_BAND_TOP = 6400;
 
     /**
-     * The wallet ladder's values, tier for tier, minus the emerald rung: the gold
-     * belt carries that band and hands off to diamond's own floor.
+     * Gear Evolution's canonical material progression - leather, chainmail, iron,
+     * gold, diamond, netherite - at its own values (every canonical chestplate
+     * climbs at 0.003), each belt tier taking the rung in its position: {@code belt}
+     * is leather, {@code copper_belt} sits in chainmail's slot. The wallets share
+     * every one of these ceilings.
      */
     private static final List<Tier> LADDER = List.of(
-            new Tier("belt_leather", "travelertoolbelt:belt", 0, 1000, 0.001, "travelertoolbelt:copper_belt"),
-            new Tier("belt_copper", "travelertoolbelt:copper_belt", 1000, 2000, 0.002, "travelertoolbelt:iron_belt"),
-            new Tier("belt_iron", "travelertoolbelt:iron_belt", 2000, 4000, 0.003, "travelertoolbelt:gold_belt"),
-            new Tier("belt_gold", "travelertoolbelt:gold_belt", 4000, 16000, 0.004, "travelertoolbelt:diamond_belt"),
-            new Tier("belt_diamond", "travelertoolbelt:diamond_belt", 16000, 32000, 0.006,
+            new Tier("belt_leather", "travelertoolbelt:belt", 0, 550, 0.003, "travelertoolbelt:copper_belt"),
+            new Tier("belt_copper", "travelertoolbelt:copper_belt", 550, 1350, 0.003, "travelertoolbelt:iron_belt"),
+            new Tier("belt_iron", "travelertoolbelt:iron_belt", 1350, 3200, 0.003, "travelertoolbelt:gold_belt"),
+            new Tier("belt_gold", "travelertoolbelt:gold_belt", 3200, 5000, 0.003, "travelertoolbelt:diamond_belt"),
+            new Tier("belt_diamond", "travelertoolbelt:diamond_belt", 5000, 7800, 0.003,
                     "travelertoolbelt:netherite_belt"),
-            new Tier("belt_netherite", "travelertoolbelt:netherite_belt", 32000, 100000, 0.006, null));
+            new Tier("belt_netherite", "travelertoolbelt:netherite_belt", 7800, 17500, 0.003, null));
 
     private record Tier(String file, String item, int minEp, int maxEp, double epGain, String evolution) {
     }
@@ -110,7 +115,7 @@ class BeltLadderTest {
     /**
      * The ladder hangs together: it opens at nothing earned, each rung hands off
      * exactly onto the next rung's floor, exactly one rung is terminal, and the top
-     * rung ends on the wallet ladder's terminal ceiling.
+     * rung ends on the canonical netherite ceiling.
      */
     @Test
     void ladderIsContiguousAndHasOneTerminal() {
@@ -135,20 +140,29 @@ class BeltLadderTest {
         }
 
         assertEquals(TERMINAL_CEILING, chain(LADDER.get(LADDER.size() - 1).file()).get("maxEP").getAsInt(),
-                "the top rung must end on the wallets' terminal ceiling");
+                "the top rung must end on the canonical netherite ceiling");
 
-        // The emerald rung the wallets use has no belt, so gold carries its band.
-        assertEquals(EMERALD_BAND_TOP, chain("belt_gold").get("maxEP").getAsInt(),
-                "the gold belt must span the wallets' emerald band, not stop at its own top");
+        // The emerald rung the wallets use has no belt: gold must hand off exactly
+        // where it begins, and the diamond belt must span it rather than leave
+        // 5000..6400 as dead EP that no belt can spend.
+        assertEquals(EMERALD_BAND_FLOOR, chain("belt_gold").get("maxEP").getAsInt(),
+                "the gold belt must hand off where the wallets' emerald rung begins");
+        JsonObject diamond = chain("belt_diamond");
+        assertTrue(diamond.get("minEP").getAsInt() <= EMERALD_BAND_FLOOR
+                        && diamond.get("maxEP").getAsInt() > EMERALD_BAND_TOP,
+                "the diamond belt must span the wallets' emerald band");
     }
 
-    /** Climb rates come from the wallet ladder and never decrease up the rungs. */
+    /**
+     * Climb rates follow the canonical progression: flat 0.003 on every rung, the
+     * rate every canonical chestplate ladder uses, and never decreasing.
+     */
     @Test
-    void climbRatesFollowTheWalletLadder() {
+    void climbRatesFollowTheCanonicalProgression() {
         double previous = 0;
         for (Tier tier : LADDER) {
             double rate = chain(tier.file()).get("epGain").getAsDouble();
-            assertEquals(tier.epGain(), rate, 1.0E-9, tier.file() + " no longer uses its wallet rate");
+            assertEquals(tier.epGain(), rate, 1.0E-9, tier.file() + " no longer uses the canonical rate");
             assertTrue(rate >= previous,
                     tier.file() + " climbs at " + rate + ", slower than the rung below it (" + previous + ")");
             previous = rate;
