@@ -157,10 +157,16 @@ warning working, not a failure.
 
 - `ci.yml` runs the template's three checks (junit, gametest, version-bump).
 - `release.yml` publishes a GitHub release for `v<mod_version>` on a push to `main`,
-  attaching the built jar, and does nothing when that release already exists. It was
-  copied from `tensura-iaf-growth`, the org's reference implementation, because the
-  template does not ship one yet (`neoforge-mod-template` #4 tracks promoting it) -
-  when that lands, reconcile this file with the template's rather than editing both.
+  attaching the built jar, and does nothing when that release already exists. It is
+  the template's file (promoted in `neoforge-mod-template` #12) with exactly the two
+  edits the template itself asks for when promoting: the jar name is now derived from
+  `mod_id` like the template's, and the release notes are rewritten to be this mod's
+  player-facing notes rather than the template's example.
+- `publish.yml` publishes the jar as a Maven artifact to the org's GitHub Packages
+  registry when that release is published, via the `maven-publish` block in
+  `build.gradle` (`artifactId` is `mod_id`, pom metadata reads `gradle.properties`).
+  `workflow_dispatch` republishes a version after a packaging fix without a new
+  release.
 - Pre-releases are opt-in: an `-alpha`/`-beta` version publishes only when the
   repository variable `ALPHA_RELEASES` is `true`. It is enabled on this repo, so
   `1.0.0-alpha.1` is a downloadable pre-release; a version with no matching release
