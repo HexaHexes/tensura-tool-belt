@@ -13,7 +13,7 @@ name: CI
 # checkout. Mod repos derived from it resolve their dependencies through
 # CurseMaven coordinates (never gitignored libs/ or testmods/ folders) - keep
 # it that way or CI cannot run.
-
+#
 # The junit job also carries a datapack drift gate: where a repo commits
 # generated output at src/generated/resources, runData must reproduce it
 # byte-identically and the jar must ship every file. It activates on that
@@ -231,6 +231,7 @@ jobs:
       - name: SpotBugs
         env:
           PACKAGE_READ_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN || github.token }}
         run: ./gradlew spotbugsMain --no-daemon --stacktrace
 
       # Report-only during the grace period: violations print in the log
@@ -239,6 +240,7 @@ jobs:
       - name: Spotless check
         env:
           PACKAGE_READ_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN || github.token }}
         run: ./gradlew spotlessCheck --no-daemon --stacktrace
         continue-on-error: true
 
