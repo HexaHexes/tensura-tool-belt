@@ -1,28 +1,30 @@
 # Tensura Tool Belt
 
-Lets **Traveler Tool Belt**'s belts grow with you: a belt you wear earns EP from the
-mobs you kill, and once it is full it evolves into the next tier — the same material
-progression the Lightman's Currency wallets climb.
+Lets **Traveler Tool Belt**'s belts grow with you: a belt you wear earns EP from
+the mobs you kill, and once it is full it evolves into the next tier, along the
+same material progression the Lightman's Currency wallets climb.
 
 ## What it does
 
-- **The belts climb a ladder.** A plain Tool Belt becomes a Copper Tool Belt, then
-  iron, gold, diamond, and finally netherite. Each tier is the next one up, and the
-  top tier is the end of the line.
-- **EP is earned by playing.** A belt you are wearing builds EP from the mobs you
-  kill. When its EP is full the belt upgrades itself, and everything it was carrying
-  comes with it — the tools stay in the belt as it moves up a tier.
-- **Wear it, do not carry it.** EP is awarded to worn gear through Curios, so the belt
-  has to be in your Curios belt slot while you fight. Without Curios it still works as
-  a belt, but it never progresses - and the mod says so in the log at startup rather
-  than leaving you guessing.
-- **Same progression as the wallets.** Every tier uses Gear Evolution's own material
-  values — leather 550, chainmail 1350, iron 3200, gold 5000, diamond 7800, netherite
-  17500 — so a belt climbs at the same pace as armor. The wallets add an emerald rung
-  (5,000 → 6,400) that Traveler Tool Belt has no tier for, so the diamond belt spans
-  that band instead — no dead stretch where the belt earns EP but nothing happens.
-- **Without Gear Evolution nothing breaks.** The belts craft, hold and swap exactly as
-  Traveler Tool Belt ships them; they just never progress.
+- A plain Tool Belt becomes a Copper Tool Belt, then iron, gold, diamond, and
+  finally netherite, with each tier the next one up. The belt you already have
+  is the one that climbs, so there is nothing to convert and no new item to
+  learn. The top tier is the end of the line.
+- A belt you are wearing builds EP from the mobs you kill. When its EP is full
+  the belt upgrades itself, and everything it was carrying comes with it; the
+  tools stay in the belt as it moves up a tier.
+- EP only goes to worn gear through **Curios**, so the belt has to be in your
+  Curios belt slot while you fight. Without Curios it still works as a belt, but
+  it never progresses, and the mod says so in the log at startup rather than
+  leaving you guessing.
+- Every tier uses **Gear Evolution**'s own material values (leather 550,
+  chainmail 1350, iron 3200, gold 5000, diamond 7800, netherite 17500), so a
+  belt climbs at the same pace as armor. The wallets add an emerald rung
+  (5,000 → 6,400) that Traveler Tool Belt has no tier for, so the diamond belt
+  spans that band instead, with no dead stretch where the belt earns EP but
+  nothing happens.
+- Without Gear Evolution nothing breaks. The belts craft, hold and swap exactly
+  as Traveler Tool Belt ships them; they just never progress.
 
 | Belt | Earns from EP | Upgrades into |
 |---|---|---|
@@ -33,22 +35,14 @@ progression the Lightman's Currency wallets climb.
 | Diamond Tool Belt | 5,000 EP | Netherite Tool Belt |
 | Netherite Tool Belt | 7,800 EP | — (top tier) |
 
-## Getting it in-game
-
-Install it next to Traveler Tool Belt, Tensura: Reincarnated and Gear Evolution, then
-play as usual. Craft and wear your belt the way Traveler Tool Belt already works — the
-same belt you are already carrying is the one that climbs, so there is nothing to
-convert and no new item to learn. Wear it in your belt slot (Curios) and fight; the
-belt fills up, then steps up on its own.
-
 ## Dependencies
 
 | | Mod | Why |
 |---|---|---|
 | **Required** | [Traveler Tool Belt](https://modrinth.com/mod/traveler-tool-belt) | The belts this addon evolves |
-| Optional | Gear Evolution | The belt upgrade ladder — without it the belts never progress |
+| Optional | Gear Evolution | The belt upgrade ladder; without it the belts never progress |
 | Optional | Tensura: Reincarnated | The EP the belts earn through, needed for the ladder |
-| Optional | [Curios API](https://modrinth.com/mod/curios) | The only worn-gear slot Gear Evolution awards EP through - without it the belts never progress |
+| Optional | [Curios API](https://modrinth.com/mod/curios) | The only worn-gear slot Gear Evolution awards EP through; without it the belts never progress |
 | Optional | ManasCore | Tensura's own library, installed alongside it |
 
 Made for the **Tensura RPG** pack (Minecraft 1.21.1, NeoForge).
