@@ -1,8 +1,7 @@
 # Tensura Tool Belt
 
 Lets **Traveler Tool Belt**'s belts grow with you: a belt you wear earns EP from
-the mobs you kill, and once it is full it evolves into the next tier, along the
-same material progression the Lightman's Currency wallets climb.
+the mobs you kill, and once it is full it evolves into the next tier.
 
 ## What it does
 
@@ -19,10 +18,8 @@ same material progression the Lightman's Currency wallets climb.
   leaving you guessing.
 - Every tier uses **Gear Evolution**'s own material values (leather 550,
   chainmail 1350, iron 3200, gold 5000, diamond 7800, netherite 17500), so a
-  belt climbs at the same pace as armor. The wallets add an emerald rung
-  (5,000 → 6,400) that Traveler Tool Belt has no tier for, so the diamond belt
-  spans that band instead, with no dead stretch where the belt earns EP but
-  nothing happens.
+  belt climbs at the same pace as armor. The tiers line up so there is no dead
+  stretch where a belt earns EP but has nothing left to evolve into.
 - Without Gear Evolution nothing breaks. The belts craft, hold and swap exactly
   as Traveler Tool Belt ships them; they just never progress.
 
