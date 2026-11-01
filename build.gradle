@@ -50,6 +50,16 @@ neoForge {
             type = "gameTestServer"
             gameDirectory = project.layout.projectDirectory.dir('run')
         }
+
+        // Regenerates src/generated/resources - the belt ladder that ships
+        // inside the jar. --mod scopes datagen to this mod only, so the
+        // dependencies' own providers never write into our output.
+        data {
+            data()
+            programArguments.addAll '--mod', mod_id, '--all',
+                    '--output', file('src/generated/resources').absolutePath,
+                    '--existing', file('src/main/resources').absolutePath
+        }
     }
 
     mods {
@@ -91,6 +101,10 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 // wires the dependency so the toml is generated before resources are processed.
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
+
+// The generated datapack is committed and packaged as part of the mod's
+// resources; ./gradlew runData rewrites it in place.
+sourceSets.main.resources.srcDir 'src/generated/resources'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
