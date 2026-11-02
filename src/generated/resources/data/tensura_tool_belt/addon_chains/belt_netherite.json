@@ -1,6 +1,6 @@
 {
+  "epGain": 0.003,
   "item": "travelertoolbelt:netherite_belt",
-  "minEP": 7800,
   "maxEP": 17500,
-  "epGain": 0.003
+  "minEP": 7800
 }

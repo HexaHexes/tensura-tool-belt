@@ -50,6 +50,16 @@ neoForge {
             type = "gameTestServer"
             gameDirectory = project.layout.projectDirectory.dir('run')
         }
+
+        // Regenerates src/generated/resources - the belt ladder that ships
+        // inside the jar. --mod scopes datagen to this mod only, so the
+        // dependencies' own providers never write into our output.
+        data {
+            data()
+            programArguments.addAll '--mod', mod_id, '--all',
+                    '--output', file('src/generated/resources').absolutePath,
+                    '--existing', file('src/main/resources').absolutePath
+        }
     }
 
     mods {
@@ -91,6 +101,10 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 // wires the dependency so the toml is generated before resources are processed.
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
+
+// The generated datapack is committed and packaged as part of the mod's
+// resources; ./gradlew runData rewrites it in place.
+sourceSets.main.resources.srcDir 'src/generated/resources'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -177,12 +191,19 @@ tasks.register('prepareGametestMods', Sync) {
     into 'run/mods'
 }
 
-tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+// Both the GameTest run and the data run boot FML against the `run` directory,
+// so both need the required travelertoolbelt jar staged first - without it the
+// data run aborts at mod loading with "Missing or unsupported mandatory
+// dependencies" before datagen writes a single file.
+tasks.matching { it.name == 'runGameTestServer' || it.name == 'runData' }.configureEach {
     dependsOn 'prepareGametestMods'
+}
 
-    // Grade the run on the log summary, not the exit code: the GameTestServer
-    // prints "All N required tests passed :)" when every required test succeeds.
-    // Keep expectedTests in sync with the @GameTest methods in src/gametest.
+// Grade the GameTest run on the log summary, not the exit code: the
+// GameTestServer prints "All N required tests passed :)" when every required
+// test succeeds. Keep expectedTests in sync with the @GameTest methods in
+// src/gametest. This must NOT attach to runData, which shares no log contract.
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     def expectedTests = 5
     doLast {
         def log = file('run/logs/latest.log')
