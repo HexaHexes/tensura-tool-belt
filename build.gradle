@@ -191,12 +191,19 @@ tasks.register('prepareGametestMods', Sync) {
     into 'run/mods'
 }
 
-tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+// Both the GameTest run and the data run boot FML against the `run` directory,
+// so both need the required travelertoolbelt jar staged first - without it the
+// data run aborts at mod loading with "Missing or unsupported mandatory
+// dependencies" before datagen writes a single file.
+tasks.matching { it.name == 'runGameTestServer' || it.name == 'runData' }.configureEach {
     dependsOn 'prepareGametestMods'
+}
 
-    // Grade the run on the log summary, not the exit code: the GameTestServer
-    // prints "All N required tests passed :)" when every required test succeeds.
-    // Keep expectedTests in sync with the @GameTest methods in src/gametest.
+// Grade the GameTest run on the log summary, not the exit code: the
+// GameTestServer prints "All N required tests passed :)" when every required
+// test succeeds. Keep expectedTests in sync with the @GameTest methods in
+// src/gametest. This must NOT attach to runData, which shares no log contract.
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
     def expectedTests = 5
     doLast {
         def log = file('run/logs/latest.log')
