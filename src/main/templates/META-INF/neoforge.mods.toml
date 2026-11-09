@@ -63,3 +63,21 @@ type = "optional"
 versionRange = "[${tensura_mod_version},)"
 ordering = "AFTER"
 side = "BOTH"
+
+# README rows with no direct code coupling: Curios is the worn-gear slot
+# Gear Evolution awards EP through, ManasCore is Tensura's own library -
+# both present alongside their own required closures, declared for the full
+# inventory (same rule as gearevolution above).
+[[dependencies.${mod_id}]]
+modId = "curios"
+type = "optional"
+versionRange = "[9,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "manascore"
+type = "optional"
+versionRange = "[4.0.0.2,)"
+ordering = "AFTER"
+side = "BOTH"
