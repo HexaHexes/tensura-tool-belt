@@ -5,8 +5,8 @@ in [`neoforge-mod-template`](https://github.com/HexaHexes/neoforge-mod-template)
 pulled in verbatim - **never hand-edit it.** Everything in this file is this repo's own
 and is edited freely; keep it aligned with the org rules rather than restating them.
 
-**Repo:** `tensura-tool-belt` · **Mod ID:** `tensura_tool_belt` · **Branch:** `main`
-**Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_tool_belt-<version>.jar`
+**Repo:** `HexaHexes/tensura-tool-belt` · **Mod ID:** `tensura_tool_belt` · **Branch:** `neoforge-1.21.1` (the loader line; this is the default branch - no `main`)
+**Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_tool_belt-neoforge-1.21.1-<version>.jar`
 
 Registers Traveler Tool Belt's six belts with Tensura: Gear Evolution's `addon_chains/`
 so they earn EP and evolve tier to tier, on Gear Evolution's canonical material
